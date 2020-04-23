@@ -7,6 +7,7 @@
     <authors>inRiverCommunity</authors>
     <owners>inRiverCommunity</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
     <projectUrl>https://github.com/inRiverCommunity/Extensions</projectUrl>
     <description>This package contains core code to ease working with iPMC extensions.</description>
     <dependencies>
