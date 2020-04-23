@@ -12,7 +12,7 @@ Download the [``inRiverCommunity.Extensions.Core``](https://www.nuget.org/packag
 
 Parsing and working with the extension ``Context.Settings`` is sometimes a lot of work, to make the lives easier for the developers we have create the ability to declare a C# class with properties for your extensions settings, that are then parsed and easier to work with that the ``Context.Settings`` dictionary.
 
-Take a look at the [``MySampleExtension.cs``](https://github.com/inRiverCommunity/Extensions/blob/master/inRiverCommunity.Extensions/Samples/inRiverCommunity.Extensions.ExtensionSettingsSample/MySampleExtension.cs) in the [ExtensionSettingsSample](https://github.com/inRiverCommunity/Extensions/tree/master/inRiverCommunity.Extensions/Samples/inRiverCommunity.Extensions.ExtensionSettingsSample) project to get a clearer picture of the capabilities and how to use the `ExtensionSettings` class and it's methods.
+Take a look at the [``MySampleExtension.cs``](https://github.com/inRiverCommunity/Extensions/blob/master/Samples/inRiverCommunity.Extensions.ExtensionSettingsSample/MySampleExtension.cs) in the [ExtensionSettingsSample](https://github.com/inRiverCommunity/Extensions/tree/master/Samples/inRiverCommunity.Extensions.ExtensionSettingsSample) project to get a clearer picture of the capabilities and how to use the `ExtensionSettings` class and it's methods.
 
 
 ## How do I contribute
