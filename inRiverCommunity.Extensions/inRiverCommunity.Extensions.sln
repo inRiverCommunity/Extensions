@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2B64FEA-28DF-4FD6-A493-01B338921BF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inRiverCommunity.Extensions.ExtensionSettingsSample", "Samples\inRiverCommunity.Extensions.ExtensionSettingsSample\inRiverCommunity.Extensions.ExtensionSettingsSample.csproj", "{621DC8CC-DF33-4E92-9552-F2E81940FB6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inRiverCommunity.Extensions.Core", "inRiverCommunity.Extensions.Core\inRiverCommunity.Extensions.Core.csproj", "{27A42F7C-1CEA-4259-98A6-60E84CE9C1DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{621DC8CC-DF33-4E92-9552-F2E81940FB6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{621DC8CC-DF33-4E92-9552-F2E81940FB6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{621DC8CC-DF33-4E92-9552-F2E81940FB6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{621DC8CC-DF33-4E92-9552-F2E81940FB6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27A42F7C-1CEA-4259-98A6-60E84CE9C1DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27A42F7C-1CEA-4259-98A6-60E84CE9C1DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27A42F7C-1CEA-4259-98A6-60E84CE9C1DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27A42F7C-1CEA-4259-98A6-60E84CE9C1DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{621DC8CC-DF33-4E92-9552-F2E81940FB6B} = {B2B64FEA-28DF-4FD6-A493-01B338921BF2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66202CCF-730C-4F90-A49A-7B3BF0FE580E}
+	EndGlobalSection
+EndGlobal
