@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>inRiverCommunity.Extensions.Core</id>
+    <version>1.0.0</version>
+    <title>inRiverCommunity.Extensions.Core</title>
+    <authors>inRiverCommunity</authors>
+    <owners>inRiverCommunity</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/inRiverCommunity/Extensions</projectUrl>
+    <description>This package contains core code to ease working with iPMC extensions.</description>
+    <dependencies>
+      <dependency id="inRiver.Remoting.iPMC" version="7.4.20091.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\inRiverCommunity.Extensions.Core.dll" target="lib\inRiverCommunity.Extensions.Core.dll" />
+  </files>
+</package>
