@@ -38,7 +38,7 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
                 }
                 set
                 {
-                    if (value < 10 || value > 2)
+                    if (value < 10 || value > 20)
                         throw new Exception("The 'SampleIntegerBetween10And20' setting needs to be between 10 and 20!");
 
                     _sampleIntegerBetween10And20 = value;
@@ -94,7 +94,7 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
             }
             catch (Exception ex)
             {
-                // TODO: Log failure to load extension settings
+                // TODO: Log failure to load extension settings.
                 return;
             }
 
@@ -118,7 +118,7 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
             }
 
 
-            return $"Settings loaded successfully.";
+            return $"Extension and settings loaded successfully.";
         }
 
 
