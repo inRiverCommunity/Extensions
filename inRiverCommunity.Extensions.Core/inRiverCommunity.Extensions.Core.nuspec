@@ -9,6 +9,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/inRiverCommunity/Extensions</projectUrl>
+    <repository type="git" url="https://github.com/inRiverCommunity/Extensions" />
     <description>This package contains core code to ease working with iPMC extensions.</description>
     <dependencies>
       <dependency id="inRiver.Remoting.iPMC" version="7.4.20091.1" />
