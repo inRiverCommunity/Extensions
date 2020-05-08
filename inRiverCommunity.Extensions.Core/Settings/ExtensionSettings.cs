@@ -96,7 +96,7 @@ namespace inRiverCommunity.Extensions.Core.Settings
                         {
                             if (attribute != null && attribute.JsonSerialized)
                             {
-                                property.SetValue(settings, JsonConvert.DeserializeObject(value, property.PropertyType)); // TODO: Test
+                                property.SetValue(settings, JsonConvert.DeserializeObject(value, property.PropertyType));
                             }
                             else if (property.PropertyType.IsEnum)
                             {
