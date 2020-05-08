@@ -2,7 +2,9 @@
 
 namespace inRiverCommunity.Extensions.Core.Settings
 {
-    // TODO: Document
+    /// <summary>
+    /// This class is used to set attributes on your extension settings class properties.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ExtensionSettingAttribute : Attribute
     {
@@ -31,6 +33,11 @@ namespace inRiverCommunity.Extensions.Core.Settings
         /// If empty collection values should be removed, string.IsNullOrEmpty() is used. 
         /// </summary>
         public bool CollectionRemoveEmptyValues;
+
+        /// <summary>
+        /// If the data is json serialized.
+        /// </summary>
+        public bool JsonSerialized;
 
         /// <summary>
         /// The value will always be fetched from this server setting, any value set in Context.Settings are ignored.

@@ -1,27 +1,30 @@
 ﻿using inRiver.Remoting.Extension;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace inRiverCommunity.Extensions.Core.Settings
 {
-    // TODO: Document
+    /// <summary>
+    /// This class contains methods when working with extension settings.
+    /// </summary>
     public static class ExtensionSettings
     {
 
-
-        // TODO: Fallback to server setting for specified extension settings
-        
-
-        // TODO: Document
+        /// <summary>
+        /// Initializes or parses a settings dictionary to the settings class of your choosing.
+        /// </summary>
+        /// <typeparam name="T">Your settings class type</typeparam>
+        /// <param name="context">An inRiver context</param>
+        /// <param name="settingsDictionary">A settings dictionary</param>
+        /// <returns>An initialized settings class</returns>
         public static T GetSettings<T>(this inRiverContext context, Dictionary<string, string> settingsDictionary = null)
         {
-            // Validate input
-            if (context == null)
-                throw new Exception("The context cannot be null!");
-
-
             var settings = (T)Activator.CreateInstance(typeof(T));
+
+
+            // TODO: Add try catch validation for each setting and gather the collective result for easier validation to the user
 
 
             if (settingsDictionary != null && settingsDictionary.Count > 0)
@@ -48,7 +51,14 @@ namespace inRiverCommunity.Extensions.Core.Settings
                         // Get value from server setting
                         if (attribute != null && !string.IsNullOrEmpty(attribute.GetValueFromServerSetting))
                         {
-                            value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting); // TODO: Test
+                            if (context == null)
+                                throw new Exception($"Cannot get the '{settingName}' value from the '{attribute.GetValueFromServerSetting}' server setting because the passed 'context' (inRiverContext) is null!");
+
+                            try
+                            {
+                                value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting);
+                            }
+                            catch { }
 
                             if (attribute.Mandatory && string.IsNullOrEmpty(value))
                                 throw new Exception($"The '{settingName}' property is mandatory and fetches its value from the '{attribute.GetValueFromServerSetting}' server setting, but the server setting value is null or empty!");
@@ -64,7 +74,14 @@ namespace inRiverCommunity.Extensions.Core.Settings
                                 // Fall back to server setting because the value is empty
                                 if (!string.IsNullOrEmpty(attribute.FallBackToServerSettingIfValueIsEmpty))
                                 {
-                                    value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting); // TODO: Test
+                                    if (context == null)
+                                        throw new Exception($"Cannot get the '{settingName}' value by falling back to the '{attribute.FallBackToServerSettingIfValueIsEmpty}' server setting because the passed 'context' (inRiverContext) is null!");
+
+                                    try
+                                    {
+                                        value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting);
+                                    }
+                                    catch { }
 
                                     if (attribute.Mandatory && string.IsNullOrEmpty(value))
                                         throw new Exception($"The '{settingName}' property is mandatory and requires a value, the provided value and the fallback to the server setting '{attribute.GetValueFromServerSetting}' are both be null or empty!");
@@ -77,9 +94,13 @@ namespace inRiverCommunity.Extensions.Core.Settings
 
                         if (!string.IsNullOrEmpty(value))
                         {
-                            if (property.PropertyType.IsEnum)
+                            if (attribute != null && attribute.JsonSerialized)
                             {
-                                property.SetValue(settings, Enum.Parse(property.PropertyType, value), null);
+                                property.SetValue(settings, JsonConvert.DeserializeObject(value, property.PropertyType));
+                            }
+                            else if (property.PropertyType.IsEnum)
+                            {
+                                property.SetValue(settings, Enum.Parse(property.PropertyType, value));
                             }
                             else if (typeof(List<string>).IsAssignableFrom(property.PropertyType))
                             {
@@ -107,7 +128,7 @@ namespace inRiverCommunity.Extensions.Core.Settings
                                     list.Add(listValue);
                                 }
 
-                                property.SetValue(settings, list, null);
+                                property.SetValue(settings, list);
                             }
                             // TODO: Implement
                             //else if (property.PropertyType.IsArray)
@@ -119,7 +140,7 @@ namespace inRiverCommunity.Extensions.Core.Settings
                             //}
                             else
                             {
-                                property.SetValue(settings, Convert.ChangeType(value, property.PropertyType), null);
+                                property.SetValue(settings, Convert.ChangeType(value, property.PropertyType));
                             }
                         }
                     }
@@ -130,15 +151,16 @@ namespace inRiverCommunity.Extensions.Core.Settings
             return settings;
         }
 
-        
-        // TODO: Document
+
+        /// <summary>
+        /// Converts your settings class/object to a settings dictionary.
+        /// </summary>
+        /// <typeparam name="T">Your settings class type</typeparam>
+        /// <param name="context">An inRiver context</param>
+        /// <param name="settingsObject">An initialized settings class</param>
+        /// <returns>An initialized settings dictionary</returns>
         public static Dictionary<string, string> GetSettingsAsDictionary<T>(this inRiverContext context, T settingsObject = default)
         {
-            // Validate input
-            if (context == null)
-                throw new Exception("The context cannot be null!");
-
-
             var dictionary = new Dictionary<string, string>();
 
 
@@ -164,7 +186,11 @@ namespace inRiverCommunity.Extensions.Core.Settings
 
                 if (value != null)
                 {
-                    if (typeof(List<string>).IsAssignableFrom(property.PropertyType))
+                    if (attribute != null && attribute.JsonSerialized)
+                    {
+                        stringValue = JsonConvert.SerializeObject(value);
+                    }
+                    else if (typeof(List<string>).IsAssignableFrom(property.PropertyType))
                     {
                         if (string.IsNullOrEmpty(attribute?.CollectionDelimiter))
                             throw new Exception($"You need to specify a 'CollectionDelimiter' value for the 'ExtensionSetting' attribute for the property '{settingName}'!");
