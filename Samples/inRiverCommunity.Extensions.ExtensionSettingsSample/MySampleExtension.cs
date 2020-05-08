@@ -52,29 +52,31 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
             [ExtensionSetting(Name = "AlternativeSettingsNameForProperty")]
             public string SampleStringWithDifferentSettingsName { get; set; }
 
+
             // String lists are supported.
             [ExtensionSetting(
-                CollectionDelimiter = ",", // It's mandatory to specify a delimiter for string lists.
+                CollectionDelimiter = ",", // It's mandatory to specify a delimiter for string lists, there's no default delimiter.
                 CollectionTrimValues = true, // Set this if you want to 'string.Trim()' entered values.
                 CollectionRemoveEmptyValues = true // Set this if you want to remove empty values.
             )]
             public List<string> SampleEntityTypeIdList { get; set; } = new List<string> { "Product", "Item", "Resource" };
 
 
+            // You can even use classes and other object types that are json serialized.
+            [ExtensionSetting(JsonSerialized = true)]
+            public MySampleClass SampleClass { get; set; }
+
+
             // You can select to always get the value from a server setting.
-            [ExtensionSetting(
-                GetValueFromServerSetting = "SomeDatabaseConnectionString"
-            )]
+            [ExtensionSetting(GetValueFromServerSetting = "SomeDatabaseConnectionString")]
             public string SampleDatabaseConnectionString { get; set; }
 
 
             // You can also fall back to a server setting if the settings value is empty.
-            [ExtensionSetting(
-                FallBackToServerSettingIfValueIsEmpty = "SomeApiEndpoint"
-            )]
+            [ExtensionSetting(FallBackToServerSettingIfValueIsEmpty = "SomeApiEndpoint")]
             public string SampleApiEndpoint { get; set; }
         }
-        
+
 
         public inRiverContext Context { get; set; }
 
@@ -114,7 +116,7 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
             }
             catch (Exception ex)
             {
-                return $"Failed to parse extension settings: {ex.Message}";
+                return $"Failed to parse extension settings: {ex}";
             }
 
 
