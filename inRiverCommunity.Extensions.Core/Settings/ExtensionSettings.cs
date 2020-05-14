@@ -12,6 +12,18 @@ namespace inRiverCommunity.Extensions.Core.Settings
     public static class ExtensionSettings
     {
 
+
+        /// <summary>
+        /// Initializes or parses a settings dictionary to the settings class of your choosing.
+        /// </summary>
+        /// <typeparam name="T">Your settings class type</typeparam>
+        /// <param name="settingsDictionary">A settings dictionary</param>
+        /// <returns>An initialized settings class</returns>
+        public static T GetSettings<T>(Dictionary<string, string> settingsDictionary = null)
+        {
+            return GetSettings<T>(null, settingsDictionary);
+        }
+
         /// <summary>
         /// Initializes or parses a settings dictionary to the settings class of your choosing.
         /// </summary>
@@ -25,6 +37,11 @@ namespace inRiverCommunity.Extensions.Core.Settings
 
 
             // TODO: Add try catch validation for each setting and gather the collective result for easier validation to the user
+
+
+            // Get the settings dictionary from the context if the context is specified and the passed settings dictionary is null
+            if (settingsDictionary == null && context != null)
+                settingsDictionary = context.Settings;
 
 
             if (settingsDictionary != null && settingsDictionary.Count > 0)
@@ -151,6 +168,17 @@ namespace inRiverCommunity.Extensions.Core.Settings
             return settings;
         }
 
+
+        /// <summary>
+        /// Converts your settings class/object to a settings dictionary.
+        /// </summary>
+        /// <typeparam name="T">Your settings class type</typeparam>
+        /// <param name="settingsObject">An initialized settings class</param>
+        /// <returns>An initialized settings dictionary</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary<T>(T settingsObject = default)
+        {
+            return GetSettingsAsDictionary<T>(null, settingsObject);
+        }
 
         /// <summary>
         /// Converts your settings class/object to a settings dictionary.
