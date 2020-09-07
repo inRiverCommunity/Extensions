@@ -50,7 +50,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utilities\WorkAreaUtilities.cs" />
+    <Compile Include="WorkAreaFolderCache.cs" />
+    <Compile Include="WorkAreaFolderCacheItem.cs" />
+    <Compile Include="WorkAreaFolderType.cs" />
+    <Compile Include="WorkAreaFolderUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
