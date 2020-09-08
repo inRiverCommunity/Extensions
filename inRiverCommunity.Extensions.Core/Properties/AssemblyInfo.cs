@@ -25,5 +25,5 @@ using System.Runtime.InteropServices;
 // Major (may contain breaking changes, new functionality and bug fixes)
 // Minor (may contain new functionality and possible bug fixes)
 // Patch (only contains bug fixes)
-[assembly: AssemblyVersion("1.2.0")]
-[assembly: AssemblyFileVersion("1.2.0")]
+[assembly: AssemblyVersion("1.3.0")]
+[assembly: AssemblyFileVersion("1.3.0")]

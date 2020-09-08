@@ -13,6 +13,8 @@ namespace inRiverCommunity.Extensions.Core.Settings
     {
 
 
+        #region GetSettings Methods
+
         /// <summary>
         /// Initializes or parses a settings dictionary to the settings class of your choosing.
         /// </summary>
@@ -169,16 +171,10 @@ namespace inRiverCommunity.Extensions.Core.Settings
         }
 
 
-        /// <summary>
-        /// Converts your settings class/object to a settings dictionary.
-        /// </summary>
-        /// <typeparam name="T">Your settings class type</typeparam>
-        /// <param name="settingsObject">An initialized settings class</param>
-        /// <returns>An initialized settings dictionary</returns>
-        public static Dictionary<string, string> GetSettingsAsDictionary<T>(T settingsObject = default)
-        {
-            return GetSettingsAsDictionary<T>(null, settingsObject);
-        }
+        #endregion
+
+        #region GetSettingsAsDictionary Methods
+
 
         /// <summary>
         /// Converts your settings class/object to a settings dictionary.
@@ -189,16 +185,105 @@ namespace inRiverCommunity.Extensions.Core.Settings
         /// <returns>An initialized settings dictionary</returns>
         public static Dictionary<string, string> GetSettingsAsDictionary<T>(this inRiverContext context, T settingsObject = default)
         {
-            var dictionary = new Dictionary<string, string>();
-
-
             // Create a new setting object if one wasn't passed
             if (EqualityComparer<T>.Default.Equals(settingsObject, default))
                 settingsObject = (T)Activator.CreateInstance(typeof(T));
 
 
+            return GetSettingsAsDictionary_Internal(settingsObject);
+        }
+
+        /// <summary>
+        /// Converts your settings class/object to a settings dictionary.
+        /// </summary>
+        /// <typeparam name="T">Your settings class type</typeparam>
+        /// <param name="settingsObject">An initialized settings class</param>
+        /// <returns>An initialized settings dictionary</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary<T>(T settingsObject = default)
+        {
+            // Create a new setting object if one wasn't passed
+            if (EqualityComparer<T>.Default.Equals(settingsObject, default))
+                settingsObject = (T)Activator.CreateInstance(typeof(T));
+
+
+            return GetSettingsAsDictionary_Internal(settingsObject);
+        }
+
+
+        /// <summary>
+        /// TODO: Document (If multiple types are passed with duplicate identical keys, the first default value is taken)
+        /// </summary>
+        /// <param name="context">An inRiver context</param>
+        /// <param name="typeList"></param>
+        /// <returns>An initialized settings dictionary of default values</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary(this inRiverContext context, params Type[] typeList)
+        {
+            return GetSettingsAsDictionary(typeList);
+        }
+
+
+        /// <summary>
+        /// TODO: Document (If multiple types are passed with duplicate identical keys, the first default value is taken)
+        /// </summary>
+        /// <param name="typeList"></param>
+        /// <returns>An initialized settings dictionary of default values</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary(params Type[] typeList)
+        {
+            // Validate input
+            if (typeList == null || typeList.Length == 0)
+                return new Dictionary<string, string>();
+
+
+            // Get settings dictionary for single passed type
+            if (typeList.Length == 1)
+                return GetSettingsAsDictionary_Internal(Activator.CreateInstance(typeList[0]));
+
+
+            // Get settings dictionary for multiple passed types
+            var dictionary = new Dictionary<string, string>();
+
+
+            foreach (var type in typeList)
+            {
+                if (type == null)
+                    continue;
+
+
+                // Get type dictionary
+                var typeDictionary = GetSettingsAsDictionary(type);
+
+                if (typeDictionary == null || typeDictionary.Count == 0)
+                    continue;
+
+
+                // Add type dictionary item to root dictionary
+                foreach (var key in typeDictionary.Keys)
+                {
+                    if (!dictionary.ContainsKey(key))
+                        dictionary.Add(key, typeDictionary[key]);
+                }
+            }
+
+
+            return dictionary;
+        }
+
+
+        /// <summary>
+        /// Converts your settings object to a settings dictionary.
+        /// </summary>
+        /// <param name="settingsObject">An initialized settings class object</param>
+        /// <returns>An initialized settings dictionary</returns>
+        private static Dictionary<string, string> GetSettingsAsDictionary_Internal(object settingsObject)
+        {
+            var dictionary = new Dictionary<string, string>();
+
+            if (settingsObject == null)
+                return dictionary;
+
+
             // Loop all setting properties
-            foreach (var property in typeof(T).GetProperties())
+            foreach (var property in settingsObject.GetType().GetProperties())
             {
                 // Get setting name
                 var settingName = property.Name;
@@ -251,6 +336,9 @@ namespace inRiverCommunity.Extensions.Core.Settings
 
             return dictionary;
         }
+
+
+        #endregion
 
 
     }
