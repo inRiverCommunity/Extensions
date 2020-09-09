@@ -15,6 +15,7 @@ namespace inRiverCommunity.Extensions.Core.Settings
 
         #region GetSettings Methods
 
+
         /// <summary>
         /// Initializes or parses a settings dictionary to the settings class of your choosing.
         /// </summary>
@@ -38,40 +39,67 @@ namespace inRiverCommunity.Extensions.Core.Settings
             var settings = (T)Activator.CreateInstance(typeof(T));
 
 
-            // TODO: Add try catch validation for each setting and gather the collective result for easier validation to the user
+            // TODO: Add try catch validation for each setting and gather the collective result for easier validation to the user?
 
 
-            // Get the settings dictionary from the context if the context is specified and the passed settings dictionary is null
+            // Get the settings dictionary from the context if needed
             if (settingsDictionary == null && context != null)
                 settingsDictionary = context.Settings;
 
 
-            if (settingsDictionary != null && settingsDictionary.Count > 0)
+            // Prevent NRE
+            if (settingsDictionary == null)
+                settingsDictionary = new Dictionary<string, string>();
+
+
+            foreach (var property in typeof(T).GetProperties())
             {
-                foreach (var property in typeof(T).GetProperties())
+                // Get setting name and attribute
+                var settingName = property.Name;
+                var attribute = property.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(ExtensionSettingAttribute)) as ExtensionSettingAttribute;
+
+                if (!string.IsNullOrEmpty(attribute?.Name))
+                    settingName = attribute.Name;
+
+
+                #region Get value from settings dictionary or server settings
+
+                string value = null;
+
+
+                // Get value from server setting
+                if (!string.IsNullOrEmpty(attribute?.GetValueFromServerSetting))
                 {
-                    // Get setting name
-                    var settingName = property.Name;
-                    var attribute = property.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(ExtensionSettingAttribute)) as ExtensionSettingAttribute;
+                    if (context == null)
+                        throw new Exception($"Cannot get the '{settingName}' value from the '{attribute.GetValueFromServerSetting}' server setting because the passed 'context' (inRiverContext) is null!");
 
-                    if (!string.IsNullOrEmpty(attribute?.Name))
-                        settingName = attribute.Name;
-
-
-                    if (!settingsDictionary.ContainsKey(settingName))
+                    try
                     {
-                        if (attribute != null && attribute.Mandatory)
-                            throw new Exception($"The setting '{settingName}' is mandatory!");
+                        value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting);
                     }
-                    else
-                    {
-                        string value = null;
+                    catch { }
 
-                        // Get value from server setting
-                        if (attribute != null && !string.IsNullOrEmpty(attribute.GetValueFromServerSetting))
+
+                    // Throw error if a value is mandatory and failed to get server settings value
+                    if (attribute.Mandatory && string.IsNullOrEmpty(value))
+                        throw new Exception($"The '{settingName}' property is mandatory and fetches its value from the '{attribute.GetValueFromServerSetting}' server setting, but the server setting value is null or empty!");
+                }
+                // Get value from dictionary or fallback server setting
+                else
+                {
+                    // Get value from dictionary
+                    if (settingsDictionary.ContainsKey(settingName))
+                        value = settingsDictionary[settingName];
+
+
+                    // Handle empty value
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        // Fall back to server setting if specified
+                        if (!string.IsNullOrEmpty(attribute?.FallBackToServerSettingIfValueIsEmpty))
                         {
                             if (context == null)
-                                throw new Exception($"Cannot get the '{settingName}' value from the '{attribute.GetValueFromServerSetting}' server setting because the passed 'context' (inRiverContext) is null!");
+                                throw new Exception($"Cannot get the '{settingName}' value by falling back to the '{attribute.FallBackToServerSettingIfValueIsEmpty}' server setting because the passed 'context' (inRiverContext) is null!");
 
                             try
                             {
@@ -79,91 +107,75 @@ namespace inRiverCommunity.Extensions.Core.Settings
                             }
                             catch { }
 
+
+                            // Throw error if a value is mandatory and failed to get server settings value
                             if (attribute.Mandatory && string.IsNullOrEmpty(value))
-                                throw new Exception($"The '{settingName}' property is mandatory and fetches its value from the '{attribute.GetValueFromServerSetting}' server setting, but the server setting value is null or empty!");
+                                throw new Exception($"The '{settingName}' property is mandatory and requires a value, the provided value and the fallback to the server setting '{attribute.GetValueFromServerSetting}' are both be null or empty!");
                         }
-                        // Get value from string dictionary
-                        else
-                        {
-                            // Get value from dictionary
-                            value = settingsDictionary[settingName];
-
-                            if (attribute != null && string.IsNullOrEmpty(value))
-                            {
-                                // Fall back to server setting because the value is empty
-                                if (!string.IsNullOrEmpty(attribute.FallBackToServerSettingIfValueIsEmpty))
-                                {
-                                    if (context == null)
-                                        throw new Exception($"Cannot get the '{settingName}' value by falling back to the '{attribute.FallBackToServerSettingIfValueIsEmpty}' server setting because the passed 'context' (inRiverContext) is null!");
-
-                                    try
-                                    {
-                                        value = context.ExtensionManager.UtilityService.GetServerSetting(attribute.GetValueFromServerSetting);
-                                    }
-                                    catch { }
-
-                                    if (attribute.Mandatory && string.IsNullOrEmpty(value))
-                                        throw new Exception($"The '{settingName}' property is mandatory and requires a value, the provided value and the fallback to the server setting '{attribute.GetValueFromServerSetting}' are both be null or empty!");
-                                }
-                                // Throw error if a value is mandatory
-                                else if (attribute.Mandatory)
-                                    throw new Exception($"The value for the setting '{settingName}' is mandatory cannot be null or empty!");
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            if (attribute != null && attribute.JsonSerialized)
-                            {
-                                property.SetValue(settings, JsonConvert.DeserializeObject(value, property.PropertyType));
-                            }
-                            else if (property.PropertyType.IsEnum)
-                            {
-                                property.SetValue(settings, Enum.Parse(property.PropertyType, value));
-                            }
-                            else if (typeof(List<string>).IsAssignableFrom(property.PropertyType))
-                            {
-                                if (string.IsNullOrEmpty(attribute?.CollectionDelimiter))
-                                    throw new Exception($"You need to specify a 'CollectionDelimiter' value for the 'ExtensionSetting' attribute for the property '{settingName}'!");
-
-
-                                var list = new List<string>();
-
-                                foreach (var splitValue in value.Split(new string[] { attribute.CollectionDelimiter }, StringSplitOptions.None))
-                                {
-                                    var listValue = splitValue;
-
-
-                                    // Trim value
-                                    if (attribute.CollectionTrimValues && !string.IsNullOrEmpty(listValue))
-                                        listValue = listValue.Trim();
-
-
-                                    // Don't add empty values
-                                    if (attribute.CollectionRemoveEmptyValues && string.IsNullOrEmpty(listValue))
-                                        continue;
-
-
-                                    list.Add(listValue);
-                                }
-
-                                property.SetValue(settings, list);
-                            }
-                            // TODO: Implement
-                            //else if (property.PropertyType.IsArray)
-                            //{
-                            //    if (string.IsNullOrEmpty(attribute?.CollectionDelimiter))
-                            //        throw new Exception($"You need to specify a 'CollectionDelimiter' value for the 'ExtensionSetting' attribute for the property '{settingName}'!");
-
-                            //    property.SetValue(settings, value.Split(new string[] { attribute.CollectionDelimiter }, StringSplitOptions.None), null);
-                            //}
-                            else
-                            {
-                                property.SetValue(settings, Convert.ChangeType(value, property.PropertyType));
-                            }
-                        }
+                        // Throw error if a value is mandatory
+                        else if (attribute?.Mandatory == true)
+                            throw new Exception($"The value for the setting '{settingName}' is mandatory cannot be null or empty!");
                     }
                 }
+
+                #endregion
+
+                #region Parse value and set to property
+
+                if (string.IsNullOrEmpty(value))
+                    continue;
+
+
+                if (attribute != null && attribute.JsonSerialized)
+                {
+                    property.SetValue(settings, JsonConvert.DeserializeObject(value, property.PropertyType));
+                }
+                else if (property.PropertyType.IsEnum)
+                {
+                    property.SetValue(settings, Enum.Parse(property.PropertyType, value));
+                }
+                else if (typeof(List<string>).IsAssignableFrom(property.PropertyType))
+                {
+                    if (string.IsNullOrEmpty(attribute?.CollectionDelimiter))
+                        throw new Exception($"You need to specify a 'CollectionDelimiter' value for the 'ExtensionSetting' attribute for the property '{settingName}'!");
+
+
+                    var list = new List<string>();
+
+                    foreach (var splitValue in value.Split(new string[] { attribute.CollectionDelimiter }, StringSplitOptions.None))
+                    {
+                        var listValue = splitValue;
+
+
+                        // Trim value
+                        if (attribute.CollectionTrimValues && !string.IsNullOrEmpty(listValue))
+                            listValue = listValue.Trim();
+
+
+                        // Don't add empty values
+                        if (attribute.CollectionRemoveEmptyValues && string.IsNullOrEmpty(listValue))
+                            continue;
+
+
+                        list.Add(listValue);
+                    }
+
+                    property.SetValue(settings, list);
+                }
+                // TODO: Implement
+                //else if (property.PropertyType.IsArray)
+                //{
+                //    if (string.IsNullOrEmpty(attribute?.CollectionDelimiter))
+                //        throw new Exception($"You need to specify a 'CollectionDelimiter' value for the 'ExtensionSetting' attribute for the property '{settingName}'!");
+
+                //    property.SetValue(settings, value.Split(new string[] { attribute.CollectionDelimiter }, StringSplitOptions.None), null);
+                //}
+                else
+                {
+                    property.SetValue(settings, Convert.ChangeType(value, property.PropertyType));
+                }
+
+                #endregion
             }
 
 
