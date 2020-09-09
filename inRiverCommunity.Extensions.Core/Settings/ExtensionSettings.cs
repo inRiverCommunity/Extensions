@@ -228,6 +228,28 @@ namespace inRiverCommunity.Extensions.Core.Settings
         /// <param name="context">An inRiver context</param>
         /// <param name="typeList"></param>
         /// <returns>An initialized settings dictionary of default values</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary(this inRiverContext context, List<Type> typeList)
+        {
+            return GetSettingsAsDictionary(typeList.ToArray());
+        }
+
+        /// <summary>
+        /// TODO: Document (If multiple types are passed with duplicate identical keys, the first default value is taken)
+        /// </summary>
+        /// <param name="typeList"></param>
+        /// <returns>An initialized settings dictionary of default values</returns>
+        public static Dictionary<string, string> GetSettingsAsDictionary(List<Type> typeList)
+        {
+            return GetSettingsAsDictionary(typeList.ToArray());
+        }
+
+
+        /// <summary>
+        /// TODO: Document (If multiple types are passed with duplicate identical keys, the first default value is taken)
+        /// </summary>
+        /// <param name="context">An inRiver context</param>
+        /// <param name="typeList"></param>
+        /// <returns>An initialized settings dictionary of default values</returns>
         public static Dictionary<string, string> GetSettingsAsDictionary(this inRiverContext context, params Type[] typeList)
         {
             return GetSettingsAsDictionary(typeList);

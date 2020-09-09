@@ -15,6 +15,7 @@ namespace inRiverCommunity.Extensions.TestConsoleApp
         public class One
         {
             public string MyString { get; set; } = "String value for One";
+
             public int MyInteger { get; set; } = 1;
 
             public string NoDefaultValue { get; set; }
@@ -37,6 +38,7 @@ namespace inRiverCommunity.Extensions.TestConsoleApp
             var s2 = ExtensionSettings.GetSettingsAsDictionary(typeof(One));
             var s3 = ExtensionSettings.GetSettingsAsDictionary(typeof(One), typeof(Two));
             var s4 = ExtensionSettings.GetSettingsAsDictionary(typeof(Two), typeof(One));
+            var s4a = ExtensionSettings.GetSettingsAsDictionary(new List<Type> { typeof(One), typeof(Two) });
 
             var one = new One();
             var s5 = ExtensionSettings.GetSettingsAsDictionary(one);
