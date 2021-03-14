@@ -22,6 +22,8 @@ namespace inRiverCommunity.Extensions.ExtensionSettingsSample
 
 
             // Enums are also supported...
+            // Note (ToString): Enums are written out as the string, not the number for example "DefaultValue" instead of "0" for this sample enum.
+            // Note (JSON serialized): Enums that are part of a JSON serialized class is per default printed as numbers, if you want the string to be printed instead add the "[JsonConverter(typeof(StringEnumConverter))]" attriute to your enum property.
             public MySampleEnum SampleEnum { get; set; }
 
 

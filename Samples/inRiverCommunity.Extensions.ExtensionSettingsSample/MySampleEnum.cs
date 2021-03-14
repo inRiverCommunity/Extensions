@@ -5,7 +5,7 @@
     /// </summary>
     public enum MySampleEnum
     {
-        DefaultValue,
-        NotTheDefaultValue
+        DefaultValue = 0,
+        NotTheDefaultValue = 1
     }
 }
